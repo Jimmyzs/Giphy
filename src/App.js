@@ -43,7 +43,17 @@ class App extends Component {
     fetch(url)
     .then(res => res.json())
     .then(data => {
-      this.parseData(data);
+      if (type === "random") {
+        let rand = {
+          id: data.data.id,
+          img: data.data.images.fixed_height_downsampled.url
+        }
+        this.setState({data: [rand]})
+        console.log(this.state)
+      }
+      else {
+        this.parseData(data);
+      }
     })
     .catch(err => {
       console.log(err)
