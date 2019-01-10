@@ -84,10 +84,10 @@ class App extends Component {
     ))
 
     return (
-      <div className="App">
+      <div className="grid-container">
         <header className="App-header">
           <img className="logo" src={logo}/>
-          <h2> {this.state.search} </h2>
+          <h2 style={{color: "white"}}> {this.state.search.replace(/\+/, ' ')} </h2>
           <SearchBar handleChange={(e) => {
             var input = String.fromCharCode(e.keyCode);
             if(/[a-zA-Z0-9-_ ]/.test(input) || e.keyCode === 13 || e.keyCode === 8) {
@@ -109,6 +109,7 @@ class App extends Component {
               <button class="giphyButton" onClick={() => this.searchGif("trending")}> Trending </button>
               <button class="giphyButton" onClick={() => this.searchGif("random")}> Random </button>
             </div>
+            <strong style={{color: "white"}}> Designed with 💖 by Miguel and Jimmy</strong>
         </header>
         <div className="image-container">
           {
