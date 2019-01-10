@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './SearchBar.css'
 
 class SearchBar extends Component {
     constructor(props) {
@@ -8,8 +9,7 @@ class SearchBar extends Component {
     render() {
         return (
             <div>
-                Search Bar: 
-                <input type="text" onKeyDown={this.props.handleChange}/>
+                <input class="searchBar" placeholder="Enter gif name..." type="text" onKeyDown={this.props.handleChange}/>
             </div>
         );
     }

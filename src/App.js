@@ -3,6 +3,10 @@ import './App.css';
 import { apiKey } from './config'
 import GifCard from './components/GifCard';
 import SearchBar from './components/SearchBar'
+import logo from './static/logo.png';
+import loading from './static/loading.gif';
+
+const LoadingComponent = props => <img src={props.src}/>
 
 class App extends Component {
   constructor(props) {
@@ -10,7 +14,8 @@ class App extends Component {
     this.state = {
       search: "",
       data: [],
-      isError: false
+      isError: false,
+      isLoading: false
     }
   }
 
@@ -27,28 +32,40 @@ class App extends Component {
         }
       )
     })
-    this.setState({ data: gifArr })
+    this.setState({
+      isLoading: false,
+      data: gifArr
+    })
   }
 
   searchGif(type, str) {
-    console.log(str);
     let url = ""
     if (type === "search")
       url = `http://api.giphy.com/v1/gifs/search?q=${str}&api_key=${apiKey}`
-    else if (type === "trending")
+    else if (type === "trending") {
+      this.setState({ search: "Trending"} )
       url = `http://api.giphy.com/v1/gifs/trending?api_key=${apiKey}`
-    else if (type === "random")
+    }
+    else if (type === "random") {
+      this.setState({ search: "Random"} )
       url = `http://api.giphy.com/v1/gifs/random?api_key=${apiKey}`
+    }
 
     fetch(url)
-    .then(res => res.json())
+    .then(res => {
+      this.setState({ isLoading: true });
+      return res.json()
+    })
     .then(data => {
       if (type === "random") {
         let rand = {
           id: data.data.id,
-          img: data.data.images.fixed_height_downsampled.url
+          img: data.data.images.fixed_height.url
         }
-        this.setState({data: [rand]})
+        this.setState({
+          isLoading: false,
+          data: [rand]
+        })
         console.log(this.state)
       }
       else {
@@ -69,23 +86,38 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1> Giphy 2.0 </h1>
-          <h2> Trending</h2>
+          <img className="logo" src={logo}/>
+          <h2> {this.state.search} </h2>
           <SearchBar handleChange={(e) => {
-            if (e.keyCode != 13) {
-              this.setState({ search: e.target.value.trim().split(' ').join('+')})
-            }
-            else {
-              // console.log(e.target.value.trim().split(' ').join('+') );
-              this.searchGif("search", e.target.value.trim().split(' ').join('+') );
+            var input = String.fromCharCode(e.keyCode);
+            if(/[a-zA-Z0-9-_ ]/.test(input) || e.keyCode === 13 || e.keyCode === 8) {
+              if (e.keyCode === 8) {
+                this.setState({ search: e.target.value.substr(0, e.target.value.length-1).trim().split(' ').join('+') })
+              }
+              else if (e.keyCode !== 13 && String.fromCharCode(e.keyCode)) {
+                let val = e.target.value;
+                val += input.toLowerCase();
+                this.setState({ search: val.trim().split(' ').join('+') })
+              }
+              else {
+                this.searchGif("search", e.target.value.trim().split(' ').join('+') );
+              }
             }
           }}/>
-            <button onClick={() => this.searchGif("search", this.state.search)}> Submit </button>
-            <button onClick={() => this.searchGif("trending")}> Trending </button>
-            <button onClick={() => this.searchGif("random")}> Random </button>
+            <div className="buttons">
+              <button class="giphyButton" onClick={() => this.searchGif("search", this.state.search)}> Submit </button>
+              <button class="giphyButton" onClick={() => this.searchGif("trending")}> Trending </button>
+              <button class="giphyButton" onClick={() => this.searchGif("random")}> Random </button>
+            </div>
         </header>
         <div className="image-container">
-          {!this.state.isError ? gifs : "No Results"}
+          {
+            !this.state.isError ? 
+              this.state.isLoading ?
+                <LoadingComponent src={loading}/> :
+                  gifs : 
+                    "No Results"
+          }
         </div>
       </div>
     );

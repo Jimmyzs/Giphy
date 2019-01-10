@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
+import './GifCard.css';
 
 const GifCard = props => {
     return (
         <div>
-            <img src={props.url}/>
+            <img class="gifCard" src={props.url}/>
         </div>
     )
 }
